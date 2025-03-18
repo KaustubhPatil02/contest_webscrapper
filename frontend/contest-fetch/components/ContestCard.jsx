@@ -11,7 +11,7 @@ const ContestCard = () => {
   useEffect(() => {
     const fetchLeetCodeContests = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/leetcode-contests");
+        const response = await axios.get("http://localhost:5001/api/leetcode-contests");
         setUpcomingLeetCodeContests(response.data.upcomingContests);
         setPastLeetCodeContests(response.data.pastContests);
       } catch (error) {
@@ -21,7 +21,7 @@ const ContestCard = () => {
 
     const fetchCodeforcesContests = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/codeforces-contests");
+        const response = await axios.get("http://localhost:5001/api/codeforces-contests");
         setUpcomingCodeforcesContests(response.data.upcomingContests);
         setPastCodeforcesContests(response.data.pastContests);
       } catch (error) {

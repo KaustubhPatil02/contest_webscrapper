@@ -1,9 +1,10 @@
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
+const fetchLeetCodeContestProblems = require('./fetchLeetCodeContestProblems');
 
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
 
 app.use(cors()); // Enable CORS for frontend requests
 
@@ -84,6 +85,23 @@ app.get('/api/codeforces-contests', async (req, res) => {
   } catch (error) {
     console.error("Error fetching Codeforces contests:", error.response?.data || error.message);
     res.status(500).json({ error: error.response?.data || error.message });
+  }
+});
+
+
+app.get('/api/leetcode-contest-problems', async (req, res) => {
+  const { contestUrl } = req.query;
+
+  if (!contestUrl) {
+    return res.status(400).json({ error: 'Contest URL is required' });
+  }
+
+  try {
+    const problems = await fetchLeetCodeContestProblems(contestUrl);
+    res.json({ problems });
+  } catch (error) {
+    console.error('Error fetching contest problems:', error.message);
+    res.status(500).json({ error: 'Failed to fetch contest problems' });
   }
 });
 
