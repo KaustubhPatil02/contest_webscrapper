@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import ProblemDetails from "./ProblemDetails";
 
 const ContestCard = () => {
   const [upcomingLeetCodeContests, setUpcomingLeetCodeContests] = useState([]);
@@ -7,6 +8,7 @@ const ContestCard = () => {
   const [upcomingCodeforcesContests, setUpcomingCodeforcesContests] = useState([]);
   const [pastCodeforcesContests, setPastCodeforcesContests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedContestUrl, setSelectedContestUrl] = useState(null);
 
   useEffect(() => {
     const fetchLeetCodeContests = async () => {
@@ -38,27 +40,17 @@ const ContestCard = () => {
     fetchAllContests();
   }, []);
 
-  const handleCardClick = (url) => {
-    window.open(url, "_blank");
-  };
+  if (selectedContestUrl) {
+    return (
+      <ProblemDetails
+        contestUrl={selectedContestUrl}
+        onBack={() => setSelectedContestUrl(null)}
+      />
+    );
+  }
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Upcoming LeetCode Contests</h2>
-      {loading ? (
-        <p>Loading contests...</p>
-      ) : upcomingLeetCodeContests.length === 0 ? (
-        <p>No contests available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {upcomingLeetCodeContests.map((contest, index) => (
-            <div key={index} className="bg-white shadow-lg rounded-lg p-4 cursor-pointer" onClick={() => handleCardClick(contest.url)}>
-              <h3 className="text-xl font-semibold">{contest.title}</h3>
-              <p className="text-gray-500">{contest.time}</p>
-            </div>
-          ))}
-        </div>
-      )}
       <h2 className="text-2xl font-bold mb-4">Past LeetCode Contests</h2>
       {loading ? (
         <p>Loading contests...</p>
@@ -67,39 +59,13 @@ const ContestCard = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {pastLeetCodeContests.map((contest, index) => (
-            <div key={index} className="bg-white shadow-lg rounded-lg p-4 cursor-pointer" onClick={() => handleCardClick(contest.url)}>
+            <div
+              key={index}
+              className="bg-white shadow-lg rounded-lg p-4 cursor-pointer"
+              onClick={() => setSelectedContestUrl(contest.url)}
+            >
               <h3 className="text-xl font-semibold">{contest.title}</h3>
               <p className="text-gray-500">{contest.time}</p>
-            </div>
-          ))}
-        </div>
-      )}
-      <h2 className="text-2xl font-bold mb-4">Upcoming Codeforces Contests</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : upcomingCodeforcesContests.length === 0 ? (
-        <p>No contests available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {upcomingCodeforcesContests.map(contest => (
-            <div key={contest.id} className="bg-white shadow-lg rounded-lg p-4 cursor-pointer" onClick={() => handleCardClick(contest.url)}>
-              <h3 className="text-xl font-semibold">{contest.name}</h3>
-              <p>Starts at: {contest.startTime}</p>
-            </div>
-          ))}
-        </div>
-      )}
-      <h2 className="text-2xl font-bold mb-4">Past Codeforces Contests</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : pastCodeforcesContests.length === 0 ? (
-        <p>No contests available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {pastCodeforcesContests.map(contest => (
-            <div key={contest.id} className="bg-white shadow-lg rounded-lg p-4 cursor-pointer" onClick={() => handleCardClick(contest.url)}>
-              <h3 className="text-xl font-semibold">{contest.name}</h3>
-              <p>Started at: {contest.startTime}</p>
             </div>
           ))}
         </div>

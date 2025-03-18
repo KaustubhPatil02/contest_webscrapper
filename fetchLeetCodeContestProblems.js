@@ -1,62 +1,37 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require("puppeteer");
 
 async function fetchLeetCodeContestProblems(contestUrl) {
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: false }); // Change to false to debug
     const page = await browser.newPage();
 
-    // Navigate to the contest page
-    await page.goto(contestUrl, { waitUntil: 'networkidle2' });
+    console.log(`Navigating to: ${contestUrl}`);
+    await page.goto(contestUrl, { waitUntil: "domcontentloaded" });
 
-    // Scrape the problem titles and URLs
+    // Ensure page is fully loaded
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    // Scroll down to trigger lazy loading
+    await page.evaluate(() => window.scrollBy(0, window.innerHeight));
+
+    // Find the correct selector dynamically
     const problems = await page.evaluate(() => {
-      const problemElements = Array.from(document.querySelectorAll('.table-responsive tbody tr'));
-      return problemElements.map(row => {
-        const titleElement = row.querySelector('td:nth-child(2) a');
+      const items = document.querySelectorAll(".contest-question-list .list-group-item");
+      return Array.from(items).map(item => {
+        const titleElement = item.querySelector('a');
         const title = titleElement ? titleElement.textContent.trim() : null;
         const url = titleElement ? titleElement.href : null;
         return { title, url };
       }).filter(problem => problem.title && problem.url); // Filter out invalid entries
     });
 
+    console.log("Scraped problems:", problems);
     await browser.close();
     return problems;
   } catch (error) {
-    console.error('Error fetching contest problems:', error.message);
+    console.error("Error fetching contest problems:", error.message);
     return [];
   }
 }
 
 module.exports = fetchLeetCodeContestProblems;
-
-// const puppeteer = require('puppeteer');
-
-// async function fetchLeetCodeContestProblems(contestUrl) {
-//   try {
-//     const browser = await puppeteer.launch({ headless: true });
-//     const page = await browser.newPage();
-
-//     console.log(`Navigating to: ${contestUrl}`);
-//     await page.goto(contestUrl, { waitUntil: 'networkidle2' });
-
-//     // Scrape the problem titles and URLs
-//     const problems = await page.evaluate(() => {
-//       const problemRows = Array.from(document.querySelectorAll('.table-responsive tbody tr'));
-//       return problemRows.map(row => {
-//         const titleElement = row.querySelector('td:nth-child(2) a');
-//         const title = titleElement ? titleElement.textContent.trim() : null;
-//         const url = titleElement ? titleElement.href : null;
-//         return { title, url };
-//       }).filter(problem => problem.title && problem.url); // Filter out invalid entries
-//     });
-
-//     console.log('Scraped problems:', problems);
-//     await browser.close();
-//     return problems;
-//   } catch (error) {
-//     console.error('Error fetching contest problems:', error.message);
-//     return [];
-//   }
-// }
-
-// module.exports = fetchLeetCodeContestProblems;

@@ -58,6 +58,27 @@ app.get('/api/leetcode-contests', async (req, res) => {
   }
 });
 
+
+// Route to fetch problems for a specific LeetCode contest
+app.get('/api/leetcode-contest-problems', async (req, res) => {
+  const { contestUrl } = req.query;
+
+  if (!contestUrl) {
+    return res.status(400).json({ error: 'Contest URL is required' });
+  }
+
+  try {
+    const problems = await fetchLeetCodeContestProblems(contestUrl);
+    if (problems.length === 0) {
+      return res.status(404).json({ error: 'No problems found for the contest' });
+    }
+    res.json({ problems });
+  } catch (error) {
+    console.error('Error fetching contest problems:', error.message);
+    res.status(500).json({ error: 'Failed to fetch contest problems' });
+  }
+});
+
 // Route to fetch Codeforces contests
 app.get('/api/codeforces-contests', async (req, res) => {
   try {
@@ -89,6 +110,23 @@ app.get('/api/codeforces-contests', async (req, res) => {
 });
 
 
+// app.get('/api/leetcode-contest-problems', async (req, res) => {
+//   const { contestUrl } = req.query;
+
+//   if (!contestUrl) {
+//     return res.status(400).json({ error: 'Contest URL is required' });
+//   }
+
+//   try {
+//     const problems = await fetchLeetCodeContestProblems(contestUrl);
+//     res.json({ problems });
+//   } catch (error) {
+//     console.error('Error fetching contest problems:', error.message);
+//     res.status(500).json({ error: 'Failed to fetch contest problems' });
+//   }
+// });
+// Route to fetch problems for a specific LeetCode contest
+// Route to fetch problems for a specific LeetCode contest
 app.get('/api/leetcode-contest-problems', async (req, res) => {
   const { contestUrl } = req.query;
 
@@ -98,12 +136,16 @@ app.get('/api/leetcode-contest-problems', async (req, res) => {
 
   try {
     const problems = await fetchLeetCodeContestProblems(contestUrl);
+    if (problems.length === 0) {
+      return res.status(404).json({ error: 'No problems found for the contest' });
+    }
     res.json({ problems });
   } catch (error) {
     console.error('Error fetching contest problems:', error.message);
     res.status(500).json({ error: 'Failed to fetch contest problems' });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
